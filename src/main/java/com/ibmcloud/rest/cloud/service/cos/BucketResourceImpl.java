@@ -1,5 +1,6 @@
 package com.ibmcloud.rest.cloud.service.cos;
 
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public class BucketResourceImpl implements BucketResource {
                 .map(Bucket::getName)
                 .collect(Collectors.joining(", "));
     }
-    
+
     @Override
     public void listObjects(String bucketName) {
         System.out.println("Listing objects in bucket " + bucketName);
@@ -34,9 +35,12 @@ public class BucketResourceImpl implements BucketResource {
         System.out.println();
     }
 
-    public static void main(String[] args) {
-        BucketResourceImpl _cos = new BucketResourceImpl();
-
-        _cos.listObjects("jax-rsbucket");
+    @Override
+    public void saveAnObject(String path, String bucketName, String fileName) {
+        cosClient.putObject(
+                bucketName,
+                fileName, // the object key
+                new File(path) // the file name and path of the object to be uploaded
+        );
     }
 }
