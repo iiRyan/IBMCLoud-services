@@ -25,6 +25,7 @@
         <user name="yourUserName" password="" />
         -->
     </basicRegistry>
+    <logging traceSpecification="com.ibm.ws.jaxrs.*=all" />
 
     <!-- To access this server from a remote client add a host attribute to the following element, e.g. host="*" -->
     <httpEndpoint id="defaultHttpEndpoint"
