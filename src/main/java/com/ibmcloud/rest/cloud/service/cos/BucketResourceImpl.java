@@ -9,9 +9,11 @@ import java.util.stream.Collectors;
 
 import com.ibm.cloud.objectstorage.services.s3.AmazonS3;
 import com.ibm.cloud.objectstorage.services.s3.model.Bucket;
+import com.ibm.cloud.objectstorage.services.s3.model.HeadBucketRequest;
 import com.ibm.cloud.objectstorage.services.s3.model.ListObjectsRequest;
 import com.ibm.cloud.objectstorage.services.s3.model.ObjectListing;
 import com.ibm.cloud.objectstorage.services.s3.model.S3ObjectSummary;
+import com.ibmcloud.rest.Exception.NoSuchBucketException;
 
 public class BucketResourceImpl implements BucketOperation {
 
@@ -27,22 +29,23 @@ public class BucketResourceImpl implements BucketOperation {
     }
 
     @Override
-    public List<String> listObjects(String bucketName) {
+    public List<String> listObjects(String bucketName) throws NoSuchBucketException {
+        try {
+            // Check if the bucket exists using the COS client
+            cosClient.headBucket(new HeadBucketRequest(bucketName)); // Throws an exception if bucket does not exist
+        } catch (Exception e) {
+            throw new NoSuchBucketException("Bucket '" + bucketName + "' does not exist.");
+        }
 
         return Optional.ofNullable(cosClient.listObjects(new ListObjectsRequest().withBucketName(bucketName)))
                 .map(ObjectListing::getObjectSummaries)
-                .orElse(Collections.emptyList()) 
+                .orElse(Collections.emptyList())
                 .stream()
-                .filter(Objects::nonNull) 
+                .filter(Objects::nonNull)
                 .map(S3ObjectSummary::getKey)
-                .collect(Collectors.toList()); 
+                .collect(Collectors.toList());
     }
 
-    public static void main(String[] args) {
-        BucketResourceImpl _cos = new BucketResourceImpl();
-        // _cos.saveAnObject("/Users/rayan/projects/ibm-cloud-services/Dockerfile", "jax-rsbucket", "Dockerfile");
-        System.out.println(_cos.listObjects("jax-rsbucket"));
-    }
 
     @Override
     public void saveAnObject(String path, String bucketName, String fileName) {
