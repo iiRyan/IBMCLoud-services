@@ -5,6 +5,7 @@ import java.util.List;
 import com.ibmcloud.rest.Exception.NoSuchBucketException;
 import com.ibmcloud.rest.cloud.service.cos.BucketOperation;
 import com.ibmcloud.rest.cloud.service.cos.BucketResourceImpl;
+import com.ibmcloud.rest.model.COSBucket;
 
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.GET;
@@ -27,7 +28,7 @@ public class BucketResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{bucket}")
-    public List<String> getListObjects(@PathParam("bucket") String bucket)  throws NoSuchBucketException {
+    public COSBucket getListObjects(@PathParam("bucket") String bucket)  throws NoSuchBucketException {
        
             return service.listObjects(bucket);
         
