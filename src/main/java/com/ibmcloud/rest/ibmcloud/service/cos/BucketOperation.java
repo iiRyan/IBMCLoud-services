@@ -1,4 +1,4 @@
-package com.ibmcloud.rest.cloud.service.cos;
+package com.ibmcloud.rest.ibmcloud.service.cos;
 
 import java.util.List;
 

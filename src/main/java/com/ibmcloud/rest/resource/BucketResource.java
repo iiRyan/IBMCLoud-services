@@ -3,8 +3,8 @@ package com.ibmcloud.rest.resource;
 import java.util.List;
 
 import com.ibmcloud.rest.Exception.NoSuchBucketException;
-import com.ibmcloud.rest.cloud.service.cos.BucketOperation;
-import com.ibmcloud.rest.cloud.service.cos.BucketResourceImpl;
+import com.ibmcloud.rest.ibmcloud.service.cos.BucketOperation;
+import com.ibmcloud.rest.ibmcloud.service.cos.BucketResourceImpl;
 import com.ibmcloud.rest.model.COSBucket;
 
 import jakarta.ws.rs.PathParam;

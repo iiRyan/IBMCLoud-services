@@ -46,7 +46,6 @@ public class ApiKeyCheckFilter implements ContainerRequestFilter {
         String apiKey = requestContext.getHeaderString(API_KEY_HEADER);
         // Did client forget to send an API KEY header?
         if (apiKey == null) {
-            System.out.println("outide filter method");
             requestContext.abortWith(Response.status(Status.UNAUTHORIZED).build());
             return;
         }
