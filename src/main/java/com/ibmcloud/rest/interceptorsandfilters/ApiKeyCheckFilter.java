@@ -24,7 +24,7 @@ import jakarta.ws.rs.ext.Provider;
 @Provider
 public class ApiKeyCheckFilter implements ContainerRequestFilter {
     private static final String API_KEY_HEADER = "X-API-KEY";
-    private static final int MAX_REQUESTS_PER_INTERVAL = 3;
+    private static final int MAX_REQUESTS_PER_INTERVAL = 10;
     private static final int INTERVAL = 5;
     private static final TimeUnit INTERVAL_UNIT = TimeUnit.MINUTES;
 

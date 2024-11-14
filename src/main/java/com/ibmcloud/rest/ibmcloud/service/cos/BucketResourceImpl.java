@@ -1,6 +1,5 @@
 package com.ibmcloud.rest.ibmcloud.service.cos;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -14,29 +13,35 @@ import com.ibm.cloud.objectstorage.services.s3.model.ListObjectsRequest;
 import com.ibm.cloud.objectstorage.services.s3.model.ObjectListing;
 import com.ibm.cloud.objectstorage.services.s3.model.S3ObjectSummary;
 import com.ibmcloud.rest.Exception.NoSuchBucketException;
+import com.ibmcloud.rest.ibmcloud.service.cloudant.CloudantOperation;
+import com.ibmcloud.rest.model.BucketModel;
 import com.ibmcloud.rest.model.COSBucket;
 import com.ibmcloud.rest.model.StorageObject;
 
 public class BucketResourceImpl implements BucketOperation {
 
     private static final AmazonS3 cosClient = COSClient.INSTANCE.getCosClient();
+    private CloudantOperation cloudantOperation = new CloudantOperation();
 
     @Override
-    public List<String> findAllOpBuckets() {
+    public List<BucketModel> findAllOpBuckets() {
+        // Get the list of buckets from the COS client
         List<Bucket> buckets = cosClient.listBuckets();
 
+        
         return Optional.ofNullable(buckets)
-                .filter(Objects::nonNull)
-                .orElse(Collections.emptyList())
+                .orElse(Collections.emptyList()) 
                 .stream()
-                .filter(Objects::nonNull).map(Bucket::getName)
+                .filter(Objects::nonNull)
+                .map(bucket -> new BucketModel(bucket.getName()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public COSBucket listObjects(String bucketName) throws NoSuchBucketException {
         COSBucket theBucket = new COSBucket();
-        theBucket.setName(bucketName); // Set the bucket name
+        BucketModel bucketModel = new BucketModel();
+        bucketModel.setBucketName(bucketName); // Set the bucket name
 
         try {
             System.out.println("Bucket name: " + bucketName);
@@ -45,26 +50,23 @@ public class BucketResourceImpl implements BucketOperation {
             throw new NoSuchBucketException("Bucket '" + bucketName + "' does not exist.");
         }
 
-        // Retrieve object summaries and populate COSBucket
+        
         List<StorageObject> storageObjects = Optional.ofNullable(
                 cosClient.listObjects(new ListObjectsRequest().withBucketName(bucketName)))
                 .map(ObjectListing::getObjectSummaries)
                 .orElse(Collections.emptyList())
                 .stream()
-                .filter(Objects::nonNull) // Filter out null objects
-                .map(S3ObjectSummary::getKey) // Get object names (keys)
-                .map(StorageObject::new) // Create StorageObject instances
-                .toList(); // Collect into a List
+                .filter(Objects::nonNull) 
+                .map(S3ObjectSummary::getKey) 
+                .map(StorageObject::new) 
+                .toList();
 
-        theBucket.setStorageObjects(storageObjects); // Set the list of StorageObjects
-        return theBucket; // Return the populated COSBucket
+        theBucket.setStorageObjects(storageObjects); 
+        return theBucket;
     }
+
     @Override
-    public void saveAnObject(String path, String bucketName, String fileName) {
-        cosClient.putObject(
-                bucketName,
-                fileName, // the object key
-                new File(path) // the file name and path of the object to be uploaded
-        );
+    public void saveBucketsObject(COSBucket cosBucket) {
+        cloudantOperation.save(cosBucket);
     }
 }
